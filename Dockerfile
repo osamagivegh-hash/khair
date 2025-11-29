@@ -40,7 +40,8 @@ RUN if [ -f scripts/backup-db.sh ]; then \
 RUN npm run build
 
 # Remove dev dependencies to reduce image size
-RUN npm prune --production && npm cache clean --force
+# Keep TypeScript as Next.js needs it to load next.config.ts at runtime
+RUN npm install --save typescript && npm prune --production && npm cache clean --force
 
 # Create writable directory for SQLite database
 RUN mkdir -p /data && chmod 777 /data
