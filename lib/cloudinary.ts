@@ -5,17 +5,8 @@ const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
 const apiKey = process.env.CLOUDINARY_API_KEY;
 const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-console.log('[Cloudinary Config] Initializing with:', {
-  cloudName: cloudName ? `${cloudName.substring(0, 3)}***` : 'MISSING',
-  apiKey: apiKey ? `${apiKey.substring(0, 3)}***` : 'MISSING',
-  apiSecret: apiSecret ? 'SET' : 'MISSING',
-  env: process.env.NODE_ENV,
-});
-
-if (!cloudName || !apiKey || !apiSecret) {
-  console.error('[Cloudinary Config] ERROR: Missing required environment variables!');
-  console.error('Required: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET');
-}
+// Only log in runtime (not during build)
+const isRuntime = typeof window === 'undefined' && process.env.NODE_ENV !== undefined;
 
 // Only configure if all variables are present
 if (cloudName && apiKey && apiSecret) {
@@ -25,13 +16,22 @@ if (cloudName && apiKey && apiSecret) {
     api_secret: apiSecret,
     secure: true,
   });
+  
+  // Only log in runtime to avoid build-time noise
+  if (isRuntime) {
+    console.log('[Cloudinary Config] Initialized successfully');
+  }
 } else {
-  console.error('[Cloudinary Config] CRITICAL: Cannot configure Cloudinary - missing environment variables!');
-  console.error('[Cloudinary Config] Required variables:', {
-    CLOUDINARY_CLOUD_NAME: cloudName ? 'SET' : 'MISSING',
-    CLOUDINARY_API_KEY: apiKey ? 'SET' : 'MISSING',
-    CLOUDINARY_API_SECRET: apiSecret ? 'SET' : 'MISSING',
-  });
+  // Only log errors at runtime, not during build
+  if (isRuntime) {
+    console.error('[Cloudinary Config] ERROR: Missing required environment variables!');
+    console.error('[Cloudinary Config] Required: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET');
+    console.error('[Cloudinary Config] Required variables:', {
+      CLOUDINARY_CLOUD_NAME: cloudName ? 'SET' : 'MISSING',
+      CLOUDINARY_API_KEY: apiKey ? 'SET' : 'MISSING',
+      CLOUDINARY_API_SECRET: apiSecret ? 'SET' : 'MISSING',
+    });
+  }
 }
 
 export default cloudinary;
