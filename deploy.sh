@@ -75,7 +75,7 @@ gcloud run deploy "$SERVICE_NAME" \
   --min-instances 0 \
   --max-instances 10 \
   --timeout 300 \
-  --set-env-vars "DATABASE_URL=mongodb+srv://osamashaer66_db_user:990099@mawaddah.lh79hv8.mongodb.net/?appName=Mawaddah,NODE_ENV=production" \
+  --set-env-vars "DATABASE_URL=mongodb+srv://osamashaer66_db_user:990099@mawaddah.lh79hv8.mongodb.net/?appName=Mawaddah,NODE_ENV=production,CLOUDINARY_CLOUD_NAME=dlsobyta0,CLOUDINARY_API_KEY=778583779232949,CLOUDINARY_API_SECRET=j5iHrKcFMgoUZYDxRNMAFR5z0vM" \
   --quiet
 
 if [ $? -eq 0 ]; then
