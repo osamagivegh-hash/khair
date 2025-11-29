@@ -40,8 +40,8 @@ RUN if [ -f scripts/backup-db.sh ]; then \
 RUN npm run build
 
 # Remove dev dependencies to reduce image size
-# Keep TypeScript as Next.js needs it to load next.config.ts at runtime
-RUN npm install --save typescript && npm prune --production && npm cache clean --force
+# Keep TypeScript and ts-node as Next.js needs them (TypeScript for config, ts-node for seeding)
+RUN npm install --save typescript ts-node && npm prune --production && npm cache clean --force
 
 # Create writable directory for SQLite database
 RUN mkdir -p /data && chmod 777 /data
@@ -61,4 +61,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 # Start the application
 # Ensure PORT is set (Cloud Run sets this automatically)
 # Next.js 16 automatically uses PORT env var, but we'll be explicit
-CMD ["sh", "-c", "mkdir -p /data && chmod 777 /data && npx prisma migrate deploy || true && PORT=${PORT:-8080} npm start"]
+# Auto-seed database if empty (only on first run)
+CMD ["sh", "-c", "mkdir -p /data && chmod 777 /data && npx prisma migrate deploy || true && (npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts || true) && PORT=${PORT:-8080} npm start"]
