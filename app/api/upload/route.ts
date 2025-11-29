@@ -3,13 +3,43 @@ import { uploadImage } from '@/lib/cloudinary';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check Cloudinary configuration
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const apiKey = process.env.CLOUDINARY_API_KEY;
+    const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+    console.log('Cloudinary config check:', {
+      hasCloudName: !!cloudName,
+      hasApiKey: !!apiKey,
+      hasApiSecret: !!apiSecret,
+    });
+
+    if (!cloudName || !apiKey || !apiSecret) {
+      console.error('Missing Cloudinary configuration');
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Cloudinary configuration is missing. Please check environment variables.'
+        },
+        { status: 500 }
+      );
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const folder = formData.get('folder') as string || 'al-khair';
 
+    console.log('Upload request:', {
+      hasFile: !!file,
+      fileName: file?.name,
+      fileType: file?.type,
+      fileSize: file?.size,
+      folder,
+    });
+
     if (!file) {
       return NextResponse.json(
-        { error: 'No file provided' },
+        { success: false, error: 'No file provided' },
         { status: 400 }
       );
     }
@@ -18,7 +48,7 @@ export async function POST(request: NextRequest) {
     const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
     if (!validTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only images are allowed.' },
+        { success: false, error: 'Invalid file type. Only images are allowed.' },
         { status: 400 }
       );
     }
@@ -27,19 +57,26 @@ export async function POST(request: NextRequest) {
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: 'File size exceeds 10MB limit' },
+        { success: false, error: 'File size exceeds 10MB limit' },
         { status: 400 }
       );
     }
 
+    console.log('Starting upload to Cloudinary...');
     const imageUrl = await uploadImage(file, folder);
+    console.log('Upload successful:', imageUrl);
 
     return NextResponse.json({
       success: true,
       url: imageUrl,
     });
   } catch (error) {
-    console.error('Upload error:', error);
+    console.error('Upload error details:', {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      error,
+    });
+
     return NextResponse.json(
       {
         success: false,
@@ -49,4 +86,7 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+
+
 

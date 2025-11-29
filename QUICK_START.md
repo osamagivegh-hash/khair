@@ -152,3 +152,6 @@ gcloud run services update al-khair --exec-command "ls -la /data/"
 
 **Need help?** Check [CLOUD_DEPLOYMENT.md](./CLOUD_DEPLOYMENT.md) for comprehensive guide.
 
+
+
+

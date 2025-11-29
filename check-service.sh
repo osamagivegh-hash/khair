@@ -66,3 +66,6 @@ echo ""
 echo "💡 To view full logs:"
 echo "   gcloud run services logs read $SERVICE_NAME --region $REGION --limit 100"
 
+
+
+

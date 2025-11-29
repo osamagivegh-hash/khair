@@ -399,3 +399,6 @@ Your Next.js application with SQLite is now **fully prepared** for Google Cloud 
 *Project: Al-Khair Charity Website*
 *Deployment Target: Google Cloud Run*
 
+
+
+
