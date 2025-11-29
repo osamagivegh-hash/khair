@@ -13,15 +13,14 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install all dependencies (needed for build)
-RUN npm ci || npm install
-RUN npm cache clean --force
-
-# Copy Prisma schema and migrations
+# Copy Prisma schema and migrations BEFORE npm install
+# (needed because postinstall script runs prisma generate)
 COPY prisma ./prisma
 
-# Generate Prisma Client
-RUN npx prisma generate
+# Install all dependencies (needed for build)
+# The postinstall script will run prisma generate automatically
+RUN npm ci || npm install
+RUN npm cache clean --force
 
 # Copy all application files (respects .dockerignore)
 # This will copy: app/, components/, lib/, public/, config files, etc.
