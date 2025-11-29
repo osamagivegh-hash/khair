@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadImage } from '@/lib/cloudinary';
+import { uploadImage, ensureCloudinaryConfig } from '@/lib/cloudinary';
 import { handleOptions, withCors } from '@/lib/cors';
 
 // Handle OPTIONS preflight request
@@ -72,21 +72,8 @@ export async function POST(request: NextRequest) {
       return withCors(response, request);
     }
 
-    // Ensure Cloudinary is configured before upload
-    const { ensureCloudinaryConfig } = await import('@/lib/cloudinary');
-    const isConfigured = ensureCloudinaryConfig();
-    
-    if (!isConfigured) {
-      console.error('[Upload] Cloudinary not configured, attempting to configure...');
-      const response = NextResponse.json(
-        {
-          success: false,
-          error: 'Cloudinary is not properly configured. Please check environment variables.',
-        },
-        { status: 500 }
-      );
-      return withCors(response, request);
-    }
+    // Ensure Cloudinary is configured before upload (re-check at runtime)
+    ensureCloudinaryConfig();
 
     console.log('Starting upload to Cloudinary...');
     const imageUrl = await uploadImage(file, folder);
