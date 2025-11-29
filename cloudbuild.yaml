@@ -29,13 +29,13 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'al-khair'
+      - 'khair-backend-autodeploy'  # Updated to match actual service name
       - '--image'
       - 'gcr.io/$PROJECT_ID/al-khair:$COMMIT_SHA'
       - '--platform'
       - 'managed'
       - '--region'
-      - 'us-central1'
+      - 'europe-west1'  # Updated to match actual region
       - '--allow-unauthenticated'
       - '--port'
       - '8080'
