@@ -11,6 +11,9 @@ export async function GET() {
 
   const allSet = !!(cloudName && apiKey && apiSecret);
 
+  const databaseUrl = process.env.DATABASE_URL;
+  const databaseConfigured = !!databaseUrl;
+
   return NextResponse.json({
     cloudinary: {
       configured: allSet,
@@ -22,10 +25,21 @@ export async function GET() {
       status: allSet ? '✅ Configured' : '❌ Missing variables',
     },
     database: {
-      configured: !!process.env.DATABASE_URL,
-      status: process.env.DATABASE_URL ? '✅ Configured' : '❌ Missing',
+      configured: databaseConfigured,
+      variables: {
+        DATABASE_URL: databaseUrl 
+          ? (databaseUrl.includes('mongodb') 
+              ? `${databaseUrl.split('@')[0].split('://')[0]}://***@${databaseUrl.split('@')[1]?.split('/')[0] || '***'}/***`
+              : 'SET (hidden)')
+          : 'MISSING',
+      },
+      status: databaseConfigured ? '✅ Configured' : '❌ Missing',
+      help: databaseConfigured 
+        ? undefined 
+        : 'Go to: https://console.cloud.google.com/run/detail/europe-west1/khair-backend-autodeploy/variables',
     },
     nodeEnv: process.env.NODE_ENV || 'not set',
+    port: process.env.PORT || 'not set (Cloud Run sets this automatically)',
   });
 }
 

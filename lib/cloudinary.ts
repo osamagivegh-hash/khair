@@ -8,6 +8,25 @@ const apiSecret = process.env.CLOUDINARY_API_SECRET;
 // Only log in runtime (not during build)
 const isRuntime = typeof window === 'undefined' && process.env.NODE_ENV !== undefined;
 
+// Configure Cloudinary - re-check at runtime to ensure it's configured
+// This function can be called to ensure config is up-to-date
+export function ensureCloudinaryConfig() {
+  const currentCloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const currentApiKey = process.env.CLOUDINARY_API_KEY;
+  const currentApiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  if (currentCloudName && currentApiKey && currentApiSecret) {
+    cloudinary.config({
+      cloud_name: currentCloudName,
+      api_key: currentApiKey,
+      api_secret: currentApiSecret,
+      secure: true,
+    });
+    return true;
+  }
+  return false;
+}
+
 // Only configure if all variables are present
 if (cloudName && apiKey && apiSecret) {
   cloudinary.config({
@@ -39,12 +58,37 @@ export default cloudinary;
 export async function uploadImage(file: File | Buffer, folder: string = 'al-khair'): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
+      // Re-check configuration at runtime
+      const currentCloudName = process.env.CLOUDINARY_CLOUD_NAME;
+      const currentApiKey = process.env.CLOUDINARY_API_KEY;
+      const currentApiSecret = process.env.CLOUDINARY_API_SECRET;
+
       console.log('[Cloudinary Upload] Starting upload to folder:', folder);
+      console.log('[Cloudinary Upload] Config check:', {
+        hasCloudName: !!currentCloudName,
+        hasApiKey: !!currentApiKey,
+        hasApiSecret: !!currentApiSecret,
+      });
+
+      // Ensure Cloudinary is configured with current env vars
+      if (currentCloudName && currentApiKey && currentApiSecret) {
+        cloudinary.config({
+          cloud_name: currentCloudName,
+          api_key: currentApiKey,
+          api_secret: currentApiSecret,
+          secure: true,
+        });
+      }
 
       // Validate configuration before attempting upload
-      if (!cloudName || !apiKey || !apiSecret) {
+      if (!currentCloudName || !currentApiKey || !currentApiSecret) {
         const error = new Error('Cloudinary is not properly configured. Missing environment variables.');
         console.error('[Cloudinary Upload] Configuration error:', error.message);
+        console.error('[Cloudinary Upload] Missing variables:', {
+          CLOUDINARY_CLOUD_NAME: !currentCloudName,
+          CLOUDINARY_API_KEY: !currentApiKey,
+          CLOUDINARY_API_SECRET: !currentApiSecret,
+        });
         reject(error);
         return;
       }

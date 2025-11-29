@@ -62,6 +62,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Ensure Cloudinary is configured before upload
+    const { ensureCloudinaryConfig } = await import('@/lib/cloudinary');
+    const isConfigured = ensureCloudinaryConfig();
+    
+    if (!isConfigured) {
+      console.error('[Upload] Cloudinary not configured, attempting to configure...');
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Cloudinary is not properly configured. Please check environment variables.',
+        },
+        { status: 500 }
+      );
+    }
+
     console.log('Starting upload to Cloudinary...');
     const imageUrl = await uploadImage(file, folder);
     console.log('Upload successful:', imageUrl);
