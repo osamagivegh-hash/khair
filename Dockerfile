@@ -52,6 +52,6 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
 # Start the application
 # Ensure PORT is set (Cloud Run sets this automatically)
 # Next.js 16 automatically uses PORT env var, but we'll be explicit
-# MongoDB doesn't use Prisma migrations, so we skip migrate deploy
+# MongoDB doesn't use Prisma migrations, use db push to sync schema
 # Auto-seed database if empty (only on first run)
-CMD ["sh", "-c", "npx prisma db push || true && (npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts || true) && PORT=${PORT:-8080} npm start"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss || true && (npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts || true) && PORT=${PORT:-8080} npm start"]
