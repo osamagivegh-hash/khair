@@ -3,9 +3,9 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET() {
   try {
-    // Test database connection
-    await prisma.$queryRaw`SELECT 1`;
-    
+    // Test database connection by performing a simple query
+    await prisma.news.count();
+
     return NextResponse.json({
       status: 'healthy',
       database: 'connected',
@@ -24,4 +24,3 @@ export async function GET() {
     );
   }
 }
-
