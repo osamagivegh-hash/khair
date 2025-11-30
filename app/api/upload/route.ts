@@ -1,173 +1,113 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 
-// Helper to configure Cloudinary safely
-function configureCloudinary() {
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
-  const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
-  const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
+// Force dynamic to prevent static optimization issues
+export const dynamic = 'force-dynamic';
 
-  if (cloudName && apiKey && apiSecret) {
+export async function POST(request: NextRequest) {
+  try {
+    console.log('=== UPLOAD REQUEST STARTED ===');
+
+    // 1. Configure Cloudinary (EXACT SAME LOGIC AS DEBUG ROUTE)
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
+    const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
+    const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
+
+    if (!cloudName || !apiKey || !apiSecret) {
+      console.error('Missing credentials in upload route');
+      return NextResponse.json({
+        success: false,
+        error: 'Server misconfiguration: Missing Cloudinary credentials',
+      }, { status: 500 });
+    }
+
     cloudinary.config({
       cloud_name: cloudName,
       api_key: apiKey,
       api_secret: apiSecret,
       secure: true,
     });
-    return true;
-  }
-  return false;
-}
 
-// CORS headers
-function setCorsHeaders(response: NextResponse) {
-  response.headers.set('Access-Control-Allow-Origin', '*');
-  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  return response;
-}
-
-// Handle OPTIONS preflight
-export async function OPTIONS() {
-  const response = new NextResponse(null, { status: 200 });
-  return setCorsHeaders(response);
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    console.log('=== UPLOAD REQUEST STARTED ===');
-
-    // Configure Cloudinary at runtime
-    const isConfigured = configureCloudinary();
-    
-    // Check configuration
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
-    const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
-    const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
-
-    console.log('Config check:', {
-      isConfigured,
-      hasCloudName: !!cloudName,
-      hasApiKey: !!apiKey,
-      hasApiSecret: !!apiSecret,
-      cloudName: cloudName ? `${cloudName.substring(0, 3)}***` : 'MISSING',
-    });
-
-    if (!isConfigured || !cloudName || !apiKey || !apiSecret) {
-      console.error('ERROR: Missing Cloudinary credentials');
-      const response = NextResponse.json(
-        {
-          success: false,
-          error: 'Cloudinary not configured. Missing environment variables.',
-          missing: {
-            cloudName: !cloudName,
-            apiKey: !apiKey,
-            apiSecret: !apiSecret,
-          }
-        },
-        { status: 500 }
-      );
-      return setCorsHeaders(response);
+    // 2. Parse Form Data safely
+    let formData;
+    try {
+      formData = await request.formData();
+    } catch (e: any) {
+      console.error('Failed to parse form data:', e);
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to read file upload. Please try again.',
+        details: e.message
+      }, { status: 400 });
     }
 
-    // Get form data
-    const formData = await request.formData();
     const file = formData.get('file') as File;
     const folder = (formData.get('folder') as string) || 'al-khair';
 
-    console.log('File info:', {
-      hasFile: !!file,
-      fileName: file?.name,
-      fileType: file?.type,
-      fileSize: file?.size,
-      folder,
-    });
-
     if (!file) {
-      const response = NextResponse.json(
-        { success: false, error: 'No file provided' },
-        { status: 400 }
-      );
-      return setCorsHeaders(response);
+      return NextResponse.json({ success: false, error: 'No file provided' }, { status: 400 });
     }
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-    if (!validTypes.includes(file.type)) {
-      const response = NextResponse.json(
-        { success: false, error: 'Invalid file type. Only images allowed.' },
-        { status: 400 }
-      );
-      return setCorsHeaders(response);
+    console.log(`Processing file: ${file.name} (${file.type}, ${file.size} bytes)`);
+
+    // 3. Convert File to Buffer safely
+    let buffer: Buffer;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      buffer = Buffer.from(arrayBuffer);
+    } catch (e: any) {
+      console.error('Failed to convert file to buffer:', e);
+      return NextResponse.json({
+        success: false,
+        error: 'Failed to process file data.',
+        details: e.message
+      }, { status: 500 });
     }
 
-    // Validate file size (10MB)
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      const response = NextResponse.json(
-        { success: false, error: 'File too large. Max 10MB.' },
-        { status: 400 }
-      );
-      return setCorsHeaders(response);
-    }
-
-    console.log('Converting file to buffer...');
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    console.log('Buffer created, size:', buffer.length);
-
-    // Upload to Cloudinary
+    // 4. Upload to Cloudinary
     console.log('Starting Cloudinary upload...');
-    const uploadResult = await new Promise<string>((resolve, reject) => {
+
+    const result = await new Promise<any>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: folder,
           resource_type: 'auto',
         },
-        (error: any, result: any) => {
+        (error, result) => {
           if (error) {
             console.error('Cloudinary upload error:', error);
             reject(error);
-          } else if (result) {
-            console.log('Upload successful:', result.secure_url);
-            resolve(result.secure_url);
           } else {
-            reject(new Error('No result from Cloudinary'));
+            resolve(result);
           }
         }
       );
 
+      // Write buffer to stream
       uploadStream.end(buffer);
     });
 
-    console.log('=== UPLOAD SUCCESS ===');
-    const response = NextResponse.json({
+    console.log('Upload successful:', result.secure_url);
+
+    return NextResponse.json({
       success: true,
-      url: uploadResult,
+      url: result.secure_url,
+      public_id: result.public_id
     });
-    return setCorsHeaders(response);
 
   } catch (error: any) {
-    console.error('=== UPLOAD ERROR ===');
-    console.error('Error type:', error?.constructor?.name);
-    console.error('Error message:', error?.message);
-    console.error('Error details:', error);
-    console.error('Error stack:', error?.stack);
-    console.error('===================');
+    console.error('Unhandled upload error:', error);
 
-    const response = NextResponse.json(
-      {
-        success: false,
-        error: error?.message || 'Upload failed',
-        errorType: error?.constructor?.name,
-        errorDetails: {
-          message: error?.message,
-          http_code: error?.http_code,
-          name: error?.name,
-        }
-      },
-      { status: 500 }
-    );
-    return setCorsHeaders(response);
+    // Return JSON even for 500 errors to avoid "Invalid JSON" on client
+    return NextResponse.json({
+      success: false,
+      error: 'Upload failed due to server error',
+      message: error.message || String(error),
+      type: error.name
+    }, { status: 500 });
   }
+}
+
+export async function OPTIONS() {
+  return NextResponse.json({}, { status: 200 });
 }

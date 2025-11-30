@@ -52,25 +52,21 @@ export default function ImageUpload({ onUploadComplete, currentImage, folder = '
         body: formData,
       })
 
-      // Check if response is JSON
-      const contentType = response.headers.get('content-type')
-      const isJson = contentType?.includes('application/json')
-
-      if (!isJson) {
-        // Server returned HTML error page (build error)
-        console.error('Server returned HTML instead of JSON. Build might have failed.')
-        setError('خطأ في الخادم. الرجاء المحاولة لاحقاً')
-        setPreview(null)
-        return
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        console.error('Failed to parse response JSON:', e);
+        setError('خطأ في الخادم (Invalid JSON response)');
+        setPreview(null);
+        return;
       }
 
-      const data = await response.json()
-
       if (!response.ok) {
-        console.error('Upload failed:', data)
-        setError(data.error || data.message || 'فشل رفع الصورة')
-        setPreview(null)
-        return
+        console.error('Upload failed:', data);
+        setError(data.error || data.message || 'فشل رفع الصورة');
+        setPreview(null);
+        return;
       }
 
       if (data.success) {
