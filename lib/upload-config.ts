@@ -17,7 +17,23 @@ const useCloudinaryEnv = trimEnv(process.env.USE_CLOUDINARY);
 const cloudinaryFolder = trimEnv(process.env.CLOUDINARY_FOLDER) || 'al-khair';
 
 /**
- * Check if Cloudinary is configured
+ * Check if Cloudinary is configured (runtime check)
+ * This function checks environment variables at runtime, not at module load time
+ */
+export function checkCloudinaryConfig(): boolean {
+  const currentCloudName = trimEnv(process.env.CLOUDINARY_CLOUD_NAME);
+  const currentApiKey = trimEnv(process.env.CLOUDINARY_API_KEY);
+  const currentApiSecret = trimEnv(process.env.CLOUDINARY_API_SECRET);
+  const currentUseCloudinary = trimEnv(process.env.USE_CLOUDINARY);
+  
+  const hasCredentials = !!currentCloudName && !!currentApiKey && !!currentApiSecret;
+  const isEnabled = currentUseCloudinary !== 'false';
+  
+  return hasCredentials && isEnabled;
+}
+
+/**
+ * Check if Cloudinary is configured (module load time - for initial config)
  */
 const hasCloudinaryCredentials = !!cloudinaryCloudName && !!cloudinaryApiKey && !!cloudinaryApiSecret;
 
@@ -94,6 +110,7 @@ export {
   hasCloudinaryCredentials,
   MAX_FILE_SIZE,
   ALLOWED_FILE_TYPES,
+  checkCloudinaryConfig,
 };
 
 export const cloudinaryConfig = isCloudinaryConfigured ? {

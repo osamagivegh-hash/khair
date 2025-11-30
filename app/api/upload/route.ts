@@ -10,9 +10,18 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Check Cloudinary configuration
-    if (!isCloudinaryConfigured) {
-      console.error('Missing Cloudinary configuration');
+    // Check Cloudinary configuration at runtime (not module load time)
+    const { checkCloudinaryConfig } = await import('@/lib/upload-config');
+    const isConfigured = checkCloudinaryConfig();
+    
+    if (!isConfigured) {
+      console.error('Missing Cloudinary configuration at runtime');
+      console.error('Environment check:', {
+        CLOUDINARY_CLOUD_NAME: !!process.env.CLOUDINARY_CLOUD_NAME,
+        CLOUDINARY_API_KEY: !!process.env.CLOUDINARY_API_KEY,
+        CLOUDINARY_API_SECRET: !!process.env.CLOUDINARY_API_SECRET,
+        USE_CLOUDINARY: process.env.USE_CLOUDINARY,
+      });
       const response = NextResponse.json(
         {
           success: false,
@@ -70,7 +79,7 @@ export async function POST(request: NextRequest) {
       success: true,
       url: imageUrl,
     });
-    
+
     return withCors(response, request);
   } catch (error) {
     console.error('=== UPLOAD ERROR ===');
@@ -90,14 +99,20 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: error instanceof Error ? error.message : 'Upload failed',
-        details: process.env.NODE_ENV === 'development' ? {
+        errorType: error?.constructor?.name,
+        // Include more details to help debug
+        details: {
+          message: error instanceof Error ? error.message : String(error),
           type: error?.constructor?.name,
-          stack: error instanceof Error ? error.stack : undefined,
-        } : undefined,
+          // Include stack trace in production for debugging (remove later if needed)
+          stack: error instanceof Error ? error.stack?.split('\n').slice(0, 5).join('\n') : undefined,
+          // Include any additional error properties
+          ...(error && typeof error === 'object' ? error : {}),
+        },
       },
       { status: 500 }
     );
-    
+
     return withCors(response, request);
   }
 }

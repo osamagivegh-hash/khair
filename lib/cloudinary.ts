@@ -8,20 +8,42 @@ export async function uploadImage(file: File | Buffer, folder: string = 'al-khai
   return new Promise(async (resolve, reject) => {
     try {
       // Import upload config
-      const { cloudinary, isCloudinaryConfigured, cloudinaryFolder: defaultFolder } = await import('./upload-config');
+      const { cloudinary, checkCloudinaryConfig, cloudinaryFolder: defaultFolder } = await import('./upload-config');
       
       // Use provided folder or default
       const uploadFolder = folder || defaultFolder;
 
+      // Check configuration at runtime
+      const isConfigured = checkCloudinaryConfig();
+      
       console.log('[Cloudinary Upload] Starting upload to folder:', uploadFolder);
-      console.log('[Cloudinary Upload] Cloudinary configured:', isCloudinaryConfigured);
+      console.log('[Cloudinary Upload] Cloudinary configured:', isConfigured);
 
       // Validate configuration before attempting upload
-      if (!isCloudinaryConfigured) {
+      if (!isConfigured) {
         const error = new Error('Cloudinary is not properly configured. Missing environment variables.');
         console.error('[Cloudinary Upload] Configuration error:', error.message);
+        console.error('[Cloudinary Upload] Env vars:', {
+          CLOUDINARY_CLOUD_NAME: !!process.env.CLOUDINARY_CLOUD_NAME,
+          CLOUDINARY_API_KEY: !!process.env.CLOUDINARY_API_KEY,
+          CLOUDINARY_API_SECRET: !!process.env.CLOUDINARY_API_SECRET,
+        });
         reject(error);
         return;
+      }
+      
+      // Re-configure Cloudinary at runtime to ensure it uses current env vars
+      const currentCloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
+      const currentApiKey = process.env.CLOUDINARY_API_KEY?.trim();
+      const currentApiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
+      
+      if (currentCloudName && currentApiKey && currentApiSecret) {
+        cloudinary.config({
+          cloud_name: currentCloudName,
+          api_key: currentApiKey,
+          api_secret: currentApiSecret,
+          secure: true,
+        });
       }
 
       let buffer: Buffer;
