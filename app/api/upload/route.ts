@@ -64,27 +64,17 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // 4. Upload to Cloudinary
-    console.log('Starting Cloudinary upload...');
+    // 4. Upload to Cloudinary (Using Base64 - Same as Debug Route)
+    console.log('Starting Cloudinary upload (Base64 method)...');
 
-    const result = await new Promise<any>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: folder,
-          resource_type: 'auto',
-        },
-        (error, result) => {
-          if (error) {
-            console.error('Cloudinary upload error:', error);
-            reject(error);
-          } else {
-            resolve(result);
-          }
-        }
-      );
+    // Convert buffer to base64 data URI
+    const base64Data = buffer.toString('base64');
+    const fileType = file.type || 'application/octet-stream';
+    const dataURI = `data:${fileType};base64,${base64Data}`;
 
-      // Write buffer to stream
-      uploadStream.end(buffer);
+    const result = await cloudinary.uploader.upload(dataURI, {
+      folder: folder,
+      resource_type: 'auto',
     });
 
     console.log('Upload successful:', result.secure_url);
