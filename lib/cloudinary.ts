@@ -1,94 +1,22 @@
-import { v2 as cloudinary } from 'cloudinary';
-
-// Validate environment variables
-const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-const apiKey = process.env.CLOUDINARY_API_KEY;
-const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-// Only log in runtime (not during build)
-const isRuntime = typeof window === 'undefined' && process.env.NODE_ENV !== undefined;
-
-// Configure Cloudinary - re-check at runtime to ensure it's configured
-// This function can be called to ensure config is up-to-date
-export function ensureCloudinaryConfig() {
-  const currentCloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  const currentApiKey = process.env.CLOUDINARY_API_KEY;
-  const currentApiSecret = process.env.CLOUDINARY_API_SECRET;
-
-  if (currentCloudName && currentApiKey && currentApiSecret) {
-    cloudinary.config({
-      cloud_name: currentCloudName,
-      api_key: currentApiKey,
-      api_secret: currentApiSecret,
-      secure: true,
-    });
-    return true;
-  }
-  return false;
-}
-
-// Only configure if all variables are present
-if (cloudName && apiKey && apiSecret) {
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: apiKey,
-    api_secret: apiSecret,
-    secure: true,
-  });
-  
-  // Only log in runtime to avoid build-time noise
-  if (isRuntime) {
-    console.log('[Cloudinary Config] Initialized successfully');
-  }
-} else {
-  // Only log errors at runtime, not during build
-  if (isRuntime) {
-    console.error('[Cloudinary Config] ERROR: Missing required environment variables!');
-    console.error('[Cloudinary Config] Required: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET');
-    console.error('[Cloudinary Config] Required variables:', {
-      CLOUDINARY_CLOUD_NAME: cloudName ? 'SET' : 'MISSING',
-      CLOUDINARY_API_KEY: apiKey ? 'SET' : 'MISSING',
-      CLOUDINARY_API_SECRET: apiSecret ? 'SET' : 'MISSING',
-    });
-  }
-}
-
-export default cloudinary;
+// Re-export from upload-config for backward compatibility
+export { cloudinary as default, isCloudinaryConfigured } from './upload-config';
 
 export async function uploadImage(file: File | Buffer, folder: string = 'al-khair'): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
-      // Re-check configuration at runtime
-      const currentCloudName = process.env.CLOUDINARY_CLOUD_NAME;
-      const currentApiKey = process.env.CLOUDINARY_API_KEY;
-      const currentApiSecret = process.env.CLOUDINARY_API_SECRET;
+      // Import upload config
+      const { cloudinary, isCloudinaryConfigured, cloudinaryFolder: defaultFolder } = await import('./upload-config');
+      
+      // Use provided folder or default
+      const uploadFolder = folder || defaultFolder;
 
-      console.log('[Cloudinary Upload] Starting upload to folder:', folder);
-      console.log('[Cloudinary Upload] Config check:', {
-        hasCloudName: !!currentCloudName,
-        hasApiKey: !!currentApiKey,
-        hasApiSecret: !!currentApiSecret,
-      });
-
-      // Ensure Cloudinary is configured with current env vars
-      if (currentCloudName && currentApiKey && currentApiSecret) {
-        cloudinary.config({
-          cloud_name: currentCloudName,
-          api_key: currentApiKey,
-          api_secret: currentApiSecret,
-          secure: true,
-        });
-      }
+      console.log('[Cloudinary Upload] Starting upload to folder:', uploadFolder);
+      console.log('[Cloudinary Upload] Cloudinary configured:', isCloudinaryConfigured);
 
       // Validate configuration before attempting upload
-      if (!currentCloudName || !currentApiKey || !currentApiSecret) {
+      if (!isCloudinaryConfigured) {
         const error = new Error('Cloudinary is not properly configured. Missing environment variables.');
         console.error('[Cloudinary Upload] Configuration error:', error.message);
-        console.error('[Cloudinary Upload] Missing variables:', {
-          CLOUDINARY_CLOUD_NAME: !currentCloudName,
-          CLOUDINARY_API_KEY: !currentApiKey,
-          CLOUDINARY_API_SECRET: !currentApiSecret,
-        });
         reject(error);
         return;
       }
@@ -112,7 +40,7 @@ export async function uploadImage(file: File | Buffer, folder: string = 'al-khai
 
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder,
+          folder: uploadFolder,
           resource_type: 'auto',
           transformation: [
             { quality: 'auto' },

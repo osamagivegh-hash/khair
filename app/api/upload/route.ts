@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { uploadImage, ensureCloudinaryConfig } from '@/lib/cloudinary';
+import { uploadImage } from '@/lib/cloudinary';
+import { isCloudinaryConfigured, isValidFileType, isValidFileSize, cloudinaryFolder, MAX_FILE_SIZE } from '@/lib/upload-config';
 import { handleOptions, withCors } from '@/lib/cors';
 
 // Handle OPTIONS preflight request
@@ -10,17 +11,7 @@ export async function OPTIONS(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Check Cloudinary configuration
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-    const apiKey = process.env.CLOUDINARY_API_KEY;
-    const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-    console.log('Cloudinary config check:', {
-      hasCloudName: !!cloudName,
-      hasApiKey: !!apiKey,
-      hasApiSecret: !!apiSecret,
-    });
-
-    if (!cloudName || !apiKey || !apiSecret) {
+    if (!isCloudinaryConfigured) {
       console.error('Missing Cloudinary configuration');
       const response = NextResponse.json(
         {
@@ -34,7 +25,7 @@ export async function POST(request: NextRequest) {
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const folder = formData.get('folder') as string || 'al-khair';
+    const folder = formData.get('folder') as string || cloudinaryFolder;
 
     console.log('Upload request:', {
       hasFile: !!file,
@@ -53,8 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-    if (!validTypes.includes(file.type)) {
+    if (!isValidFileType(file.type)) {
       const response = NextResponse.json(
         { success: false, error: 'Invalid file type. Only images are allowed.' },
         { status: 400 }
@@ -62,18 +52,15 @@ export async function POST(request: NextRequest) {
       return withCors(response, request);
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
+    // Validate file size
+    if (!isValidFileSize(file.size)) {
+      const maxSizeMB = Math.round(MAX_FILE_SIZE / 1024 / 1024);
       const response = NextResponse.json(
-        { success: false, error: 'File size exceeds 10MB limit' },
+        { success: false, error: `File size exceeds ${maxSizeMB}MB limit` },
         { status: 400 }
       );
       return withCors(response, request);
     }
-
-    // Ensure Cloudinary is configured before upload (re-check at runtime)
-    ensureCloudinaryConfig();
 
     console.log('Starting upload to Cloudinary...');
     const imageUrl = await uploadImage(file, folder);
