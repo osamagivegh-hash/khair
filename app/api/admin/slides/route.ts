@@ -33,14 +33,19 @@ export async function POST(request: NextRequest) {
         title,
         subtitle,
         imageUrl,
-        order: order || 0,
+        order: order ? parseInt(String(order)) : 0,
       },
     });
 
     return NextResponse.json(slide);
-  } catch (error) {
+  } catch (error: any) {
+    console.error('Error creating slide:', error);
     return NextResponse.json(
-      { error: 'Failed to create slide' },
+      {
+        error: 'Failed to create slide',
+        details: error.message,
+        code: error.code
+      },
       { status: 500 }
     );
   }
