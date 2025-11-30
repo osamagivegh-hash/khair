@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import cloudinary from '@/lib/cloudinary';
+import cloudinary, { isCloudinaryConfigured } from '@/lib/cloudinary';
 
 /**
  * Test endpoint to verify Cloudinary connection and credentials
@@ -11,7 +11,7 @@ export async function GET() {
     const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
     // Check if variables are set
-    if (!cloudName || !apiKey || !apiSecret) {
+    if (!isCloudinaryConfigured) {
       return NextResponse.json({
         success: false,
         error: 'Missing environment variables',

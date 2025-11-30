@@ -1,18 +1,34 @@
 import { v2 as cloudinary } from 'cloudinary';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true,
-});
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
+const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
+const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
+
+export const isCloudinaryConfigured = Boolean(cloudName && apiKey && apiSecret);
+
+if (isCloudinaryConfigured) {
+  cloudinary.config({
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
+    secure: true,
+  });
+} else {
+  console.warn('[Cloudinary] Skipping configuration: missing credentials');
+}
+
+function assertCloudinaryConfigured() {
+  if (!isCloudinaryConfigured) {
+    throw new Error('Cloudinary credentials are not configured');
+  }
+}
 
 export default cloudinary;
 
 export async function uploadImage(file: File | Buffer, folder: string = 'al-khair'): Promise<string> {
   return new Promise(async (resolve, reject) => {
     try {
+      assertCloudinaryConfigured();
       console.log('[Cloudinary] Starting upload to folder:', folder);
 
       let buffer: Buffer;
@@ -55,6 +71,8 @@ export async function uploadImage(file: File | Buffer, folder: string = 'al-khai
 
 export async function deleteImage(publicId: string): Promise<void> {
   return new Promise((resolve, reject) => {
+    assertCloudinaryConfigured();
+
     cloudinary.uploader.destroy(publicId, (error: any) => {
       if (error) {
         reject(error);
