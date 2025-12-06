@@ -48,19 +48,36 @@ mkdir -p backend/public
 cp -r frontend/dist/* backend/public/
 echo "   ✅ Frontend deployed"
 
-echo "9️⃣ Creating .env file..."
-cat > backend/.env << 'ENVEOF'
-MONGODB_URI=mongodb://localhost:27017/charity-app
-PORT=5000
-NODE_ENV=production
-CORS_ORIGIN=*
-ENVEOF
-echo "   ✅ Environment configured"
+echo "9️⃣ Installing MongoDB..."
+if ! command -v mongod &> /dev/null; then
+    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+    sudo apt-get update -y
+    sudo apt-get install -y mongodb-org
+    sudo systemctl start mongod
+    sudo systemctl enable mongod
+fi
+echo "   ✅ MongoDB installed"
 
-echo "🔟 Starting application with PM2..."
+echo "🔟 Creating PM2 ecosystem file..."
 cd backend
+cat > ecosystem.config.js << 'PMEOF'
+module.exports = {
+  apps: [{
+    name: 'charity-app',
+    script: 'src/server.js',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 5000,
+      MONGODB_URI: 'mongodb://localhost:27017/charity-app'
+    }
+  }]
+};
+PMEOF
+
+echo "   Starting with PM2..."
 pm2 delete charity-app 2>/dev/null || true
-pm2 start src/server.js --name charity-app
+pm2 start ecosystem.config.js
 pm2 save
 pm2 startup | grep 'sudo' | bash || true
 echo "   ✅ Application started"
