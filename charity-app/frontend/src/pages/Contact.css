@@ -1,0 +1,306 @@
+/* ===== CONTACT PAGE STYLES ===== */
+
+/* Page Header */
+.contact-page .page-header {
+    position: relative;
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+    text-align: center;
+    overflow: hidden;
+}
+
+.contact-page .page-header-overlay {
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23ffffff08' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 60px 60px;
+}
+
+.contact-page .page-header-content {
+    position: relative;
+    z-index: 2;
+}
+
+.contact-page .page-header h1 {
+    color: white;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.contact-page .page-header p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Contact Section */
+.contact-section {
+    background: var(--neutral-50);
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    align-items: start;
+}
+
+/* Contact Info */
+.contact-info h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.contact-intro {
+    color: var(--neutral-600);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+.contact-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.contact-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: white;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-base);
+}
+
+.contact-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateX(4px);
+}
+
+.contact-card-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-50);
+    border-radius: var(--radius-md);
+    color: var(--primary-600);
+}
+
+.contact-card-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.contact-card-content h3 {
+    font-size: 1rem;
+    font-family: var(--font-primary);
+    margin-bottom: 0.5rem;
+}
+
+.contact-card-content p,
+.contact-card-content a {
+    display: block;
+    color: var(--neutral-600);
+    font-size: 0.938rem;
+    line-height: 1.5;
+}
+
+.contact-card-content a {
+    transition: color var(--transition-fast);
+}
+
+.contact-card-content a:hover {
+    color: var(--primary-600);
+}
+
+/* Social Links */
+.contact-social h3 {
+    font-size: 1rem;
+    font-family: var(--font-primary);
+    margin-bottom: 1rem;
+}
+
+.social-links {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: white;
+    color: var(--neutral-600);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+}
+
+.social-link:hover {
+    background: var(--primary-500);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.social-link svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* Contact Form */
+.contact-form-wrapper {
+    position: sticky;
+    top: 100px;
+}
+
+.contact-form-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+}
+
+.contact-form-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Submit Status */
+.submit-status {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.submit-status.success {
+    background: var(--primary-50);
+    color: var(--primary-700);
+    border: 1px solid var(--primary-200);
+}
+
+.submit-status.error {
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+}
+
+/* Form Elements */
+.required {
+    color: var(--error);
+}
+
+.form-input.has-error,
+.form-textarea.has-error {
+    border-color: var(--error);
+}
+
+.contact-submit-btn {
+    width: 100%;
+}
+
+.contact-submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Map Section */
+.map-section {
+    width: 100%;
+}
+
+.map-placeholder {
+    position: relative;
+    height: 300px;
+    background: linear-gradient(135deg, var(--neutral-200), var(--neutral-300));
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23e5e7eb' width='100' height='100'/%3E%3Cpath d='M0 50 L50 0 L100 50 L50 100 Z' fill='%23d1d5db' opacity='0.5'/%3E%3C/svg%3E");
+}
+
+.map-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.map-text {
+    text-align: center;
+    color: white;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(10px);
+}
+
+.map-text h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.map-text p {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .contact-form-wrapper {
+        position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .contact-page .page-header {
+        padding: 4rem 0;
+    }
+
+    .contact-page .page-header h1 {
+        font-size: 2rem;
+    }
+
+    .contact-form-card {
+        padding: 1.5rem;
+    }
+
+    .contact-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .contact-card-icon {
+        margin: 0 auto;
+    }
+}

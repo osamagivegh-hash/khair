@@ -1,76 +1,26 @@
-# Dependencies
-node_modules
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# Next.js
-.next
-out
-build
-dist
-
-# Environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Git
+Dockerfile*
+docker-compose*
+.dockerignore
 .git
 .gitignore
-.gitattributes
-
-# IDE
+README.md
+LICENSE
 .vscode
 .idea
-*.swp
-*.swo
-*~
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Testing
-coverage
-.nyc_output
-
-# Logs
-logs
-*.log
-
-# Temporary files
-tmp
-temp
-*.tmp
-
-# Database backups (local)
-*.db.backup
-*.db-journal
-*.db-wal
-*.db-shm
-
-# Vercel
-.vercel
-
-# TypeScript
-*.tsbuildinfo
-# Note: next-env.d.ts will be generated during build, so it's OK to ignore
-
-# Documentation (optional - remove if you want to include)
-# README.md
-# DEPLOYMENT.md
-
-# Local development files
+node_modules
+npm-debug.log
+.next
+.env*
+!.env.example
 dev.db
-prisma/dev.db
-
-# Cloud deployment configs (keep these)
-# Dockerfile
-# .dockerignore
-# cloudbuild.yaml
-# gcloud-deploy.sh
-
+*.md
+.DS_Store
+charity-app
+scripts
+check-*.sh
+deploy.sh
+deploy.ps1
+*.db
+BUILD_*.md
+DEPLOY_*.md
+CLOUD_*.md

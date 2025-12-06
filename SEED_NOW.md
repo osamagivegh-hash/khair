@@ -86,3 +86,4 @@ gcloud run services logs read khair-backend-autodeploy --region europe-west1 --l
 
 
 
+

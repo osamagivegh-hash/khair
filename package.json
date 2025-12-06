@@ -8,9 +8,13 @@
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",
-    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts",
+    "seed": "npx ts-node -O \"{\\\"module\\\":\\\"CommonJS\\\"}\" prisma/seed.ts",
+    "seed:win": "npx ts-node -O '{\\\"module\\\":\\\"CommonJS\\\"}' prisma/seed.ts",
     "db:sync": "bash scripts/sync-db.sh",
-    "db:backup": "bash scripts/backup-db.sh"
+    "db:backup": "bash scripts/backup-db.sh",
+    "db:push": "prisma db push",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

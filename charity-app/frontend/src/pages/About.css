@@ -1,0 +1,314 @@
+/* ===== ABOUT PAGE STYLES ===== */
+
+/* Page Header */
+.page-header {
+    position: relative;
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+    text-align: center;
+    overflow: hidden;
+}
+
+.page-header-overlay {
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='none' stroke='%23ffffff08' stroke-width='1'/%3E%3C/svg%3E");
+    background-size: 60px 60px;
+}
+
+.page-header-content {
+    position: relative;
+    z-index: 2;
+}
+
+.page-header h1 {
+    color: white;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.page-header p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.125rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Mission Section */
+.mission-section {
+    background: var(--neutral-100);
+}
+
+.mission-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.mission-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    transition: all var(--transition-base);
+}
+
+.mission-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.mission-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+}
+
+.mission-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--primary-700);
+}
+
+.mission-card p {
+    color: var(--neutral-600);
+    line-height: 1.7;
+}
+
+/* Story Section */
+.story-section {
+    background: white;
+}
+
+.story-content {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.story-content h2 {
+    font-size: 2.25rem;
+    margin-bottom: 2rem;
+}
+
+.story-text p {
+    color: var(--neutral-600);
+    line-height: 1.8;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.section-label {
+    display: inline-block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--primary-500);
+    margin-bottom: 1rem;
+}
+
+/* Values Section */
+.values-section {
+    background: var(--neutral-50);
+}
+
+.values-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.value-card {
+    text-align: center;
+}
+
+.value-icon {
+    display: block;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.value-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-primary);
+}
+
+.value-card p {
+    color: var(--neutral-600);
+    font-size: 0.938rem;
+    line-height: 1.6;
+}
+
+/* Projects Section */
+.projects-section {
+    background: white;
+}
+
+.section-header {
+    max-width: 600px;
+    margin: 0 auto 3rem;
+}
+
+.section-header h2 {
+    margin-bottom: 1rem;
+}
+
+.section-description {
+    color: var(--neutral-600);
+    line-height: 1.7;
+}
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.project-card {
+    background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+    border-radius: var(--radius-xl);
+    padding: 2rem;
+    transition: all var(--transition-base);
+    border: 1px solid var(--primary-100);
+}
+
+.project-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+.project-location {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--primary-600);
+    background: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-full);
+    margin-bottom: 1rem;
+}
+
+.project-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    font-family: var(--font-primary);
+    color: var(--primary-800);
+}
+
+.project-card p {
+    color: var(--neutral-600);
+    font-size: 0.938rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.project-impact {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.impact-label {
+    color: var(--neutral-500);
+}
+
+.impact-value {
+    color: var(--primary-600);
+    font-weight: 600;
+}
+
+/* Team Section */
+.team-section {
+    background: var(--neutral-100);
+}
+
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+}
+
+.team-card {
+    background: white;
+    padding: 2rem;
+    border-radius: var(--radius-xl);
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-base);
+}
+
+.team-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.team-avatar {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.team-card h4 {
+    font-size: 1.125rem;
+    margin-bottom: 0.25rem;
+    font-family: var(--font-primary);
+}
+
+.team-card p {
+    color: var(--neutral-500);
+    font-size: 0.875rem;
+}
+
+/* About CTA */
+.about-cta {
+    background: linear-gradient(135deg, var(--neutral-50), var(--neutral-100));
+}
+
+.about-cta h2 {
+    font-size: 2.25rem;
+    margin-bottom: 1rem;
+}
+
+.about-cta p {
+    color: var(--neutral-600);
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+}
+
+.about-cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .mission-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .values-grid,
+    .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 576px) {
+    .page-header {
+        padding: 4rem 0;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+    }
+
+    .values-grid,
+    .projects-grid,
+    .team-grid {
+        grid-template-columns: 1fr;
+    }
+}

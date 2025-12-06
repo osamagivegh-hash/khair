@@ -1,5 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Enable standalone output for Docker deployment
+  output: 'standalone',
+  
   images: {
     remotePatterns: [
       {
@@ -12,6 +15,7 @@ const nextConfig = {
       },
     ],
   },
+  
   // Enable CORS for API routes
   async headers() {
     return [

@@ -1,0 +1,28 @@
+version: 1
+applications:
+  - appRoot: .
+    frontend:
+      phases:
+        preBuild:
+          commands:
+            - npm ci
+            - npx prisma generate
+        build:
+          commands:
+            - npm run build
+      artifacts:
+        baseDirectory: .next
+        files:
+          - '**/*'
+      cache:
+        paths:
+          - node_modules/**/*
+          - .next/cache/**/*
+      environment:
+        # These will be set in AWS Amplify Console
+        - DATABASE_URL
+        - CLOUDINARY_CLOUD_NAME
+        - CLOUDINARY_API_KEY
+        - CLOUDINARY_API_SECRET
+        - NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+
